@@ -1,0 +1,91 @@
+body {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-top: 72px;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.125em;
+  color: #333;
+  line-height: 1.5em;
+  padding-top: 20px;
+}
+
+h1, h2, h3 {
+  color: #000;
+}
+h1 {
+  font-size: 2.5em
+}
+
+h2 {
+  font-size: 2em;
+  padding-bottom: 0px;
+}
+
+h3 {
+  font-size: 1.5em
+}
+
+a {
+  text-decoration: none;
+  color: #09f;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.pexeso {
+  text-align: center;
+}
+
+.board {
+  width: 400px;
+  height: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button.button {
+  width: 380px;
+  border: none;
+  background: #eee;
+  border: 1px solid black;
+  border-radius: 3px;
+  margin-left: -10px;
+}
+
+.card {
+  width: 85;
+  height: 85px;
+  float: left;
+  margin: 5px;
+  border: 1px solid gray;
+  display: table;
+}
+
+.card.card-matched {
+
+  transition: opacity 1s ease-in-out;
+  opacity: 0;
+}
+
+.card-value {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  text-transform: uppercase;
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 40px;
+}
+.card-value-visible {
+  transition: opacity 1s ease-in-out;
+  opacity: 1;
+
+}
+
+.card-value-hidden {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
