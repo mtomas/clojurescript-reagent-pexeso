@@ -12,55 +12,68 @@
 (defn generate-symbols [] (shuffle (flatten (repeat 2 (take (/ board-size 2) (shuffle alpha-chars))))))
 
 ;; -------------------------
-(def state (atom {:cards [] :finished false :last-symbol ""}))
+(def state (atom {:cards [] :last-symbol nil}))
 
 (defn generate-card [symb] (atom {:symbol symb :visible false :matched false}))
 (defn generate-cards [] (mapv generate-card (generate-symbols)))
 
+;couple of helpful predicate functions
 (defn is-matched [card] (= (get @card :matched) true))
 (defn is-visible [card] (= (get @card :visible) true))
-(defn is-revealed [card] (and (is-visible card)))
+(defn is-revealed [card] (is-visible card))
+
 (defn revealed-cards-count [] (count (filter is-visible (@state :cards))))
 (defn matched-cards-count [] (count (filter is-matched (@state :cards))))
 
+; side effecting functions used for hiding/marking revealed cards
 (defn hide-nonmatch! [] (mapv #(swap! % assoc :visible false) (@state :cards)) (swap! state assoc :last-symbol ""))
 (defn mark-match! [symbol] (mapv
                               #(swap! % assoc :matched true)
                               (filterv #(= (get @% :symbol) symbol) (@state :cards))))
 
+(defn reveal-card! [card-state] (swap! card-state assoc :visible true))
 (defn start-game [] (swap! state assoc :cards (generate-cards)))
-(defn reveal-card [card-state]
-  (swap! card-state assoc :visible true))
+
 
 (defn card [card-state]
   (letfn [(handle-card-click! [event]
-      ; pair of cards was revealed, not let's go for another pair step
-      (if (= (revealed-cards-count) 2)
-        (hide-nonmatch!)
-      )
+    ; pair of cards was revealed, now let's go for another pair step
+    (if (= (revealed-cards-count) 2)
+      (hide-nonmatch!)
+    )
 
-      ;reveal next card in step
-      (reveal-card card-state)
+    ;reveal next card in step
+    (reveal-card! card-state)
 
-      ;if 2 of cards are revealed, we have to check parity
-      (if (= (revealed-cards-count) 2)
-        (do
-          (if (= (get @state :last-symbol) (get @card-state :symbol))
-            (do
-              (mark-match! (get @card-state :symbol))
-            )
+    ;if 2 of cards are revealed, we have to check parity
+    (if (= (revealed-cards-count) 2)
+      (do
+        (if (= (get @state :last-symbol) (get @card-state :symbol))
+          (do
+            (mark-match! (get @card-state :symbol))
           )
         )
       )
+    )
 
-      ;let's remember last symbol to make comparison in subsequent steps
-      (swap! state assoc :last-symbol (@card-state :symbol))
+    ;let's remember last symbol to make comparison in subsequent steps
+    (swap! state assoc :last-symbol (@card-state :symbol))
   )]
 
-    [:div.card { :onClick handle-card-click! :key (.random js/Math) :class (if (@card-state :matched) "card-matched" "card") }
-       [:span.card-value {:class (if (@card-state :visible) "card-value" "card-value-hidden")} (@card-state :symbol)]
+  [:div.card
+    {
+      :onClick handle-card-click!
+      :key (.random js/Math)
+      :class (if (@card-state :matched) "card-matched" "card")
+    }
+    [:span.card-value 
+      {
+        :class (if (@card-state :visible) "card-value" "card-value-hidden")
+      } 
+      (@card-state :symbol)
     ]
-   )
+  ]
+  )
  )
 
 (defn home-page []
@@ -69,6 +82,7 @@
     [:div.status (if (= (matched-cards-count) board-size)
         "Game is finished, congratulations !"
     )]
+
     [:br]
 
     [:button.button {:onClick start-game} "Restart game"]
