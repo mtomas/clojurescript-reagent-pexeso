@@ -18,18 +18,18 @@
 (defn generate-cards [] (mapv generate-card (generate-symbols)))
 
 ;couple of helpful predicate functions
-(defn is-matched [card] (= (get @card :matched) true))
-(defn is-visible [card] (= (get @card :visible) true))
+(defn is-matched [card] (= (:matched @card) true))
+(defn is-visible [card] (= (:visible @card) true))
 (defn is-revealed [card] (is-visible card))
 
-(defn revealed-cards-count [] (count (filter is-visible (@state :cards))))
-(defn matched-cards-count [] (count (filter is-matched (@state :cards))))
+(defn revealed-cards-count [] (count (filter is-visible (:cards @state))))
+(defn matched-cards-count [] (count (filter is-matched (:cards @state))))
 
 ; side effecting functions used for hiding/marking revealed cards
-(defn hide-nonmatch! [] (mapv #(swap! % assoc :visible false) (@state :cards)) (swap! state assoc :last-symbol ""))
+(defn hide-nonmatch! [] (mapv #(swap! % assoc :visible false) (:cards @state)) (swap! state assoc :last-symbol ""))
 (defn mark-match! [symbol] (mapv
                              #(swap! % assoc :matched true)
-                             (filterv #(= (get @% :symbol) symbol) (@state :cards))))
+                             (filterv #(= (:symbol @%) symbol) (:cards @state))))
 
 (defn reveal-card! [card-state] (swap! card-state assoc :visible true))
 (defn start-game [] (swap! state assoc :cards (generate-cards)))
@@ -46,12 +46,12 @@
 
             ;if 2 of cards are revealed, we have to check parity
             (if (and (= (revealed-cards-count) 2)
-                     (= (get @state :last-symbol)
-                        (get @card-state :symbol)))
-              (mark-match! (get @card-state :symbol)))
+                     (= (:last-symbol @state)
+                        (:symbol @card-state)))
+              (mark-match! (:symbol @card-state)))
 
             ;let's remember last symbol to make comparison in subsequent steps
-            (swap! state assoc :last-symbol (@card-state :symbol)))]
+            (swap! state assoc :last-symbol (:symbol @card-state)))]
 
     [:div.card
      {:onClick handle-card-click!
@@ -64,7 +64,7 @@
       {:class (if (@card-state :visible)
                 "card-value"
                 "card-value-hidden")}
-      (@card-state :symbol)]]))
+      (:symbol @card-state)]]))
 
 (defn home-page []
   [:div.pexeso
@@ -78,7 +78,7 @@
    [:button.button {:onClick start-game} "Restart game"]
 
    [:div.board
-    (doall (for [card-state (@state :cards)]
+    (doall (for [card-state (:cards @state)]
              (card card-state)))]])
 
 (defn current-page []
