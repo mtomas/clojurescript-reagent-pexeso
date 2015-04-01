@@ -18,11 +18,11 @@
 (defn generate-cards [] (mapv generate-card (generate-symbols)))
 
 ;couple of helpful predicate functions
-(defn is-matched [card] (= (:matched @card) true))
-(defn is-visible [card] (= (:visible @card) true))
+(defn matched? [card] (:matched @card))
+(defn visible? [card] (:visible @card))
 
-(defn revealed-cards-count [] (count (filter is-visible (:cards @state))))
-(defn matched-cards-count [] (count (filter is-matched (:cards @state))))
+(defn revealed-cards-count [] (count (filter visible? (:cards @state))))
+(defn matched-cards-count [] (count (filter matched? (:cards @state))))
 
 ; side effecting functions used for hiding/marking revealed cards
 (defn hide-nonmatch! [] (mapv #(swap! % assoc :visible false) (:cards @state)) (swap! state assoc :last-symbol ""))
