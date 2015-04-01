@@ -26,13 +26,14 @@
 
 ; side effecting functions used for hiding/marking revealed cards
 (defn hide-nonmatch! []
-  (mapv #(swap! % assoc :visible false) (:cards @state))
+  (doseq [card-state (:cards @state)]
+    (swap! card-state assoc :visible false))
   (swap! state assoc :last-symbol ""))
 
 (defn mark-match! [symbol]
-  (mapv
-    #(swap! % assoc :matched true)
-    (filterv #(= (:symbol @%) symbol) (:cards @state))))
+  (doseq [matched-card (filterv #(= (:symbol @%) symbol)
+                                (:cards @state))]
+    (swap! matched-card assoc :matched true)))
 
 (defn reveal-card! [card-state] (swap! card-state assoc :visible true))
 
