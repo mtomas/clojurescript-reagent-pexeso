@@ -20,7 +20,6 @@
 ;couple of helpful predicate functions
 (defn is-matched [card] (= (:matched @card) true))
 (defn is-visible [card] (= (:visible @card) true))
-(defn is-revealed [card] (is-visible card))
 
 (defn revealed-cards-count [] (count (filter is-visible (:cards @state))))
 (defn matched-cards-count [] (count (filter is-matched (:cards @state))))
