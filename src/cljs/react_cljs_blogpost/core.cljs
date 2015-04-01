@@ -25,12 +25,17 @@
 (defn matched-cards-count [] (count (filter matched? (:cards @state))))
 
 ; side effecting functions used for hiding/marking revealed cards
-(defn hide-nonmatch! [] (mapv #(swap! % assoc :visible false) (:cards @state)) (swap! state assoc :last-symbol ""))
-(defn mark-match! [symbol] (mapv
-                             #(swap! % assoc :matched true)
-                             (filterv #(= (:symbol @%) symbol) (:cards @state))))
+(defn hide-nonmatch! []
+  (mapv #(swap! % assoc :visible false) (:cards @state))
+  (swap! state assoc :last-symbol ""))
+
+(defn mark-match! [symbol]
+  (mapv
+    #(swap! % assoc :matched true)
+    (filterv #(= (:symbol @%) symbol) (:cards @state))))
 
 (defn reveal-card! [card-state] (swap! card-state assoc :visible true))
+
 (defn start-game [] (swap! state assoc :cards (generate-cards)))
 
 
