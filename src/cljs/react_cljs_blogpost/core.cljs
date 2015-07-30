@@ -42,21 +42,24 @@
 
 (defn card [card-state]
   (letfn [(handle-card-click! [event]
-            ; pair of cards was revealed, now let's go for another pair step
-            (if (= (revealed-cards-count) 2)
-              (hide-nonmatch!))
+            (when-not (@card-state :matched)
+              ;; pair of cards was revealed, now let's go for another pair step
+              (when (= (revealed-cards-count) 2)
+                (hide-nonmatch!))
 
-            ;reveal next card in step
-            (reveal-card! card-state)
+              ;; reveal next card in step
+              (reveal-card! card-state)
 
-            ;if 2 of cards are revealed, we have to check parity
-            (if (and (= (revealed-cards-count) 2)
-                     (= (:last-symbol @state)
-                        (:symbol @card-state)))
-              (mark-match! (:symbol @card-state)))
+              ;; if 2 of cards are revealed, we have to check parity
+              (when (and (= (revealed-cards-count) 2)
+                         (= (:last-symbol @state)
+                            (:symbol @card-state)))
+                (mark-match! (:symbol @card-state)))
 
-            ;let's remember last symbol to make comparison in subsequent steps
-            (swap! state assoc :last-symbol (:symbol @card-state)))]
+              ;; let's remember last symbol to make comparison in subsequent steps
+              (swap! state assoc :last-symbol (:symbol @card-state))
+              (when (= (matched-cards-count) board-size)
+                (swap! state assoc :started false))))]
 
     [:div.card
      {:onClick handle-card-click!
